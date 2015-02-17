@@ -18,5 +18,12 @@ module Twittbot
       bot = Twittbot::Bot.new
       bot.start
     end
+
+    desc 'generate TEMPLATE_NAME', 'Generates a template'
+    def generate(template_name)
+      require 'twittbot/generators/templates/template_generator'
+      generator = Twittbot::Generators::TemplateGenerator.new template_name, options
+      generator.create
+    end
   end
 end
