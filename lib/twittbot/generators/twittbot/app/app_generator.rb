@@ -8,9 +8,12 @@ module Twittbot
 
       TEMPLATE_DIR = File.expand_path '../templates', __FILE__
 
-      def initialize(app_name, template_dir = TEMPLATE_DIR)
+      def initialize(app_name, options = {})
+        @options = {
+            'template_dir' => TEMPLATE_DIR
+        }.merge!(options)
         @app_name = app_name
-        @template_dir = template_dir
+        @options['template_dir'] = File.expand_path @options['template_dir']
       end
 
       def create
@@ -22,9 +25,9 @@ module Twittbot
         FileUtils.mkdir_p(path)
 
         # build the template
-        files = Dir["#{TEMPLATE_DIR}/**/*"]
+        files = Dir["#{@options['template_dir']}/**/*"]
         files.each do |file|
-          real_filename = file.sub(/^#{TEMPLATE_DIR}\//, '').sub(/^_/, '.')
+          real_filename = file.sub(/^#{@options['template_dir']}\//, '').sub(/^_/, '.')
           real_path = "#{path}/#{real_filename}"
           say_status :create, real_filename, :green
           if File.directory? file
