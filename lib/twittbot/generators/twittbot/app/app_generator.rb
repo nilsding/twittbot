@@ -1,5 +1,6 @@
 require 'fileutils'
 require 'erubis'
+require 'yaml'
 
 module Twittbot
   module Generators
@@ -38,6 +39,25 @@ module Twittbot
               f.write erb.result(binding())
             end
           end
+        end
+        generate_config path
+      end
+
+      private
+
+      def generate_config(base_path)
+        config_file_name = 'config.yml'
+        say_status :create, config_file_name, :green
+        # TODO: move the default_options hash to a different file (/lib/twittbot/defaults.rb maybe?)
+        default_options = {
+            consumer_key: '',
+            consumer_secret: '',
+            access_token: '',
+            access_token_secret: '',
+        }
+
+        File.open "#{base_path}/#{config_file_name}", 'w' do |f|
+          f.write default_options.to_yaml
         end
       end
     end
