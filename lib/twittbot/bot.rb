@@ -2,15 +2,19 @@ require 'fileutils'
 require 'yaml'
 
 require 'twittbot/defaults'
+require 'twittbot/botpart'
 
 module Twittbot
   class Bot
     def initialize(options = {})
       @options = {
           current_dir: FileUtils.pwd
-      }.merge!(options)
+      }
 
-      @config = YAML.load_file File.expand_path("./#{Twittbot::CONFIG_FILE_NAME}", @options[:current_dir])
+      $bot = {
+          callbacks: {},
+          config: YAML.load_file(File.expand_path("./#{Twittbot::CONFIG_FILE_NAME}", @options[:current_dir]))
+      }.merge!(options)
 
       load_bot_code
     end
