@@ -17,4 +17,4 @@ Authorize with Twitter for the first time:
 
 And finally run the bot:
 
-    $ bundle exec twittbot run
+    $ bundle exec twittbot start

@@ -34,4 +34,4 @@ To list available templates, try this:
 
 Finally, run the bot:
 
-    $ twittbot run
+    $ twittbot start
