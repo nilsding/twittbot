@@ -36,7 +36,7 @@ module Twittbot
           else
             erb = Erubis::Eruby.new File.read(file)
             File.open real_path, 'w' do |f|
-              f.write erb.result(binding())
+              f.write erb.result(binding)
             end
           end
         end
