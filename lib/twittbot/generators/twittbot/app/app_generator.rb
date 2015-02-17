@@ -2,16 +2,16 @@ require 'fileutils'
 require 'erubis'
 require 'yaml'
 
+require 'twittbot/defaults'
+
 module Twittbot
   module Generators
     class AppGenerator
       include Thor::Shell
 
-      TEMPLATE_DIR = File.expand_path '../templates', __FILE__
-
       def initialize(app_name, options = {})
         @options = {
-            'template_dir' => TEMPLATE_DIR
+            'template_dir' => Twittbot::TEMPLATE_DIR
         }.merge!(options)
         @app_name = app_name
         @options['template_dir'] = File.expand_path @options['template_dir']
@@ -46,17 +46,15 @@ module Twittbot
       private
 
       def generate_config(base_path)
-        config_file_name = 'config.yml'
-        say_status :create, config_file_name, :green
-        # TODO: move the default_options hash to a different file (/lib/twittbot/defaults.rb maybe?)
+        say_status :create, Twittbot::CONFIG_FILE_NAME, :green
         default_options = {
-            consumer_key: '',
-            consumer_secret: '',
+            consumer_key: Twittbot::CONSUMER_KEY,
+            consumer_secret: Twittbot::CONSUMER_SECRET,
             access_token: '',
-            access_token_secret: '',
+            access_token_secret: ''
         }
 
-        File.open "#{base_path}/#{config_file_name}", 'w' do |f|
+        File.open "#{base_path}/#{Twittbot::CONFIG_FILE_NAME}", 'w' do |f|
           f.write default_options.to_yaml
         end
       end
