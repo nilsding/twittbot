@@ -11,5 +11,12 @@ module Twittbot
       generator = Twittbot::Generators::AppGenerator.new app_name, options
       generator.create
     end
+
+    desc 'start', 'Starts the bot'
+    def start
+      require 'twittbot/bot'
+      bot = Twittbot::Bot.new
+      bot.start
+    end
   end
 end
