@@ -10,5 +10,5 @@
   }
 %>
 Twittbot::BotPart.new :<%= @template_name %> do
-  puts config[:replies].sample
+  puts @config[:replies].sample
 end
