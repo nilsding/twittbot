@@ -1,0 +1,5 @@
+--exclude /templates/*
+
+*.rb lib/**/*.rb
+-
+*.md
