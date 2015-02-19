@@ -1,5 +1,4 @@
-require "twittbot/version"
+require "twittbot/defaults"
 
 module Twittbot
-  # Your code goes here...
 end
