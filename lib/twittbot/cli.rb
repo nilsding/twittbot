@@ -12,6 +12,13 @@ module Twittbot
       generator.create
     end
 
+    desc 'auth', 'authorizes with Twitter'
+    def auth
+      require 'twittbot/bot'
+      bot = Twittbot::Bot.new
+      bot.auth
+    end
+
     desc 'start', 'Starts the bot'
     def start
       require 'twittbot/bot'

@@ -19,6 +19,11 @@ module Twittbot
       load_bot_code
     end
 
+    def auth
+      puts "This will reset your current access tokens." unless $bot[:config][:access_token].empty? or $bot[:config][:access_token_secret].empty?
+      # TODO: actually authenticate with Twitter
+    end
+
     def start; end
 
     def load_bot_code
