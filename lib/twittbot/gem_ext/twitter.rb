@@ -1,0 +1,1 @@
+require 'twittbot/gem_ext/twitter/tweet'
