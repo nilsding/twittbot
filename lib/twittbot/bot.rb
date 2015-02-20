@@ -4,6 +4,7 @@ require 'twitter'
 
 require 'twittbot/defaults'
 require 'twittbot/botpart'
+require 'twittbot/gem_ext/twitter'
 
 module Twittbot
   class Bot
@@ -25,7 +26,7 @@ module Twittbot
 
     def auth
       require 'oauth'
-      say "This will reset your current access tokens." unless $bot[:config][:access_token].empty? or $bot[:config][:access_token_secret].empty?
+      say "This will reset your current access tokens." unless already_authed?
 
       # get the request token URL
       callback = OAuth::OUT_OF_BAND
@@ -47,15 +48,37 @@ module Twittbot
       $bot[:config][:access_token] = access_token.token
       $bot[:config][:access_token_secret] = access_token.secret
 
-      save_config
-
       # get the bot's user name (screen_name) and print it to the console
-      oauth_response = access_token.get('/1.1/account/verify_credentials.json?skip_status=true')
-      screen_name = oauth_response.body.match(/"screen_name"\s*:\s*"(.*?)"/).captures.first
-      puts "Hello, #{screen_name}!"
+      $bot[:config][:screen_name] = get_screen_name access_token
+      puts "Hello, #{$bot[:config][:screen_name]}!"
+
+      save_config
     end
 
-    def start; end
+    def start
+      check_config
+      $bot[:client] ||= Twitter::REST::Client.new do |cfg|
+        cfg.consumer_key        = $bot[:config][:consumer_key]
+        cfg.consumer_secret     = $bot[:config][:consumer_secret]
+        cfg.access_token        = $bot[:config][:access_token]
+        cfg.access_token_secret = $bot[:config][:access_token_secret]
+      end
+
+      @streamer ||= Twitter::Streaming::Client.new do |cfg|
+        cfg.consumer_key        = $bot[:config][:consumer_key]
+        cfg.consumer_secret     = $bot[:config][:consumer_secret]
+        cfg.access_token        = $bot[:config][:access_token]
+        cfg.access_token_secret = $bot[:config][:access_token_secret]
+      end
+
+      @userstream_thread ||= Thread.new do
+        @streamer.user do |obj|
+          handle_stream_object obj, :user
+        end
+      end
+
+      @userstream_thread.join
+    end
 
     def load_bot_code
       files = Dir["#{File.expand_path('./lib', @options[:current_dir])}/**/*"]
@@ -65,9 +88,42 @@ module Twittbot
     end
 
     def save_config
+      config = $bot[:config].clone
+      config.delete :client
       File.open "./#{Twittbot::CONFIG_FILE_NAME}", 'w' do |f|
-        f.write $bot[:config].to_yaml
+        f.write config.to_yaml
       end
+    end
+
+    def check_config
+      unless already_authed?
+        say "Please authenticate using `twittbot auth' first."
+        raise 'Not authenticated'
+      end
+    end
+
+    def handle_stream_object(object, _type)
+      case object
+        when Twitter::Tweet
+          do_callbacks :tweet, object
+        else
+          puts "no handler for #{object.class.to_s}"
+      end
+    end
+
+    def do_callbacks(callback_type, object)
+      $bot[:callbacks][callback_type][:block].call object
+    end
+
+    def already_authed?
+      !($bot[:config][:access_token].empty? or $bot[:config][:access_token_secret].empty?)
+    end
+
+    private
+
+    def get_screen_name(access_token)
+      oauth_response = access_token.get('/1.1/account/verify_credentials.json?skip_status=true')
+      oauth_response.body.match(/"screen_name"\s*:\s*"(.*?)"/).captures.first
     end
   end
 end
