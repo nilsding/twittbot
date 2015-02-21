@@ -12,9 +12,10 @@
   }
 %>
 Twittbot::BotPart.new :<%= @template_name %> do
-  on :tweet do |tweet|
-    next if tweet.user.screen_name == @config[:screen_name]
-    next unless tweet.text.include? @config[:screen_name]
+  # When someone mentions the bot...
+  on :mention do |tweet|
+    # ... reply to the tweet with a random entry of the :replies list that you
+    # configured and also include every person that was mentioned in the tweet.
     tweet.reply @config[:replies].sample, reply_all: true
   end
 end

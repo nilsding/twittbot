@@ -104,15 +104,31 @@ module Twittbot
 
     def handle_stream_object(object, _type)
       case object
+        when Twitter::Streaming::FriendList
+          do_callbacks :friend_list, object
         when Twitter::Tweet
-          do_callbacks :tweet, object
+          is_mention = (object.user.screen_name != $bot[:config][:screen_name] and object.text.include?("@" + $bot[:config][:screen_name]) and not object.retweet?)
+          do_callbacks :retweet, object if object.retweet?
+          do_callbacks :mention, object if is_mention
+          do_callbacks :tweet, object, mention: is_mention, retweet: object.retweet?
+        when Twitter::Streaming::Event
+          case object.name
+            when :favorite
+              do_callbacks :favorite, object
+            else
+              puts "no handler for #{object.class.to_s}/#{object.name}\n  -- object data:"
+              require 'pp'
+              pp object
+          end
         else
-          puts "no handler for #{object.class.to_s}"
+          puts "no handler for #{object.class.to_s}\n  -- object data:"
+          require 'pp'
+          pp object
       end
     end
 
-    def do_callbacks(callback_type, object)
-      $bot[:callbacks][callback_type][:block].call object
+    def do_callbacks(callback_type, object, options = {})
+      $bot[:callbacks][callback_type][:block].call object, options unless $bot[:callbacks][callback_type].nil?
     end
 
     def already_authed?
