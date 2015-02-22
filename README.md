@@ -30,7 +30,7 @@ And, if you want to, you can also change its behaviour by editing
 
 To list available templates, try this:
 
-    $ twittbot list templates
+    $ twittbot list-templates
 
 Finally, run the bot:
 

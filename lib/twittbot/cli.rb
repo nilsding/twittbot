@@ -26,11 +26,18 @@ module Twittbot
       bot.start
     end
 
-    desc 'generate TEMPLATE_NAME', 'Generates a template'
+    desc 'generate TEMPLATE_NAME', 'Installs a template'
     def generate(template_name)
       require 'twittbot/generators/templates/template_generator'
       generator = Twittbot::Generators::TemplateGenerator.new template_name, options
       generator.create
+    end
+
+    desc 'list-templates', 'Lists all templates'
+    def list_templates
+      require 'twittbot/template_lister'
+      lister = Twittbot::TemplateLister.new options
+      lister.list
     end
   end
 end
