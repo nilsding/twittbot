@@ -47,15 +47,9 @@ module Twittbot
 
       def generate_config(base_path)
         say_status :create, Twittbot::CONFIG_FILE_NAME, :green
-        default_options = {
-            consumer_key: Twittbot::CONSUMER_KEY,
-            consumer_secret: Twittbot::CONSUMER_SECRET,
-            access_token: '',
-            access_token_secret: ''
-        }
 
         File.open "#{base_path}/#{Twittbot::CONFIG_FILE_NAME}", 'w' do |f|
-          f.write default_options.to_yaml
+          f.write Twittbot::DEFAULT_BOT_CONFIG.to_yaml
         end
       end
     end
