@@ -13,6 +13,11 @@ module Twitter
       $bot[:client].update result, in_reply_to_status_id: self.id
     end
 
+    def retweet
+      return if $bot.nil? or $bot[:client].nil?
+      $bot[:client].retweet self.id
+    end
+
     # Scans the tweet text for screen names.
     # @param reply_all [Boolean] Include all users in the reply.
     # @param screen_name [String] The user's screen name (i.e. that one who clicked "Reply")
