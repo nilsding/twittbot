@@ -7,6 +7,7 @@ require 'twittbot/botpart'
 require 'twittbot/gem_ext/twitter'
 
 module Twittbot
+  # Class providing the streaming connections and callback logic for the bot.
   class Bot
 
     include Thor::Shell
@@ -24,9 +25,10 @@ module Twittbot
       load_bot_code
     end
 
+    # Authenticates an account with Twitter.
     def auth
       require 'oauth'
-      say "This will reset your current access tokens." unless already_authed?
+      say "This will reset your current access tokens.", :red if already_authed?
 
       # get the request token URL
       callback = OAuth::OUT_OF_BAND
@@ -55,6 +57,7 @@ module Twittbot
       save_config
     end
 
+    # Starts the bot.
     def start
       check_config
       $bot[:client] ||= Twitter::REST::Client.new do |cfg|
@@ -91,6 +94,8 @@ module Twittbot
       @tweetstream_thread.join
     end
 
+    # Loads the bot's actual code which is stored in the bot's +lib+
+    # subdirectory.
     def load_bot_code
       files = Dir["#{File.expand_path('./lib', @options[:current_dir])}/**/*"]
       files.each do |file|
@@ -98,6 +103,7 @@ module Twittbot
       end
     end
 
+    # Saves the bot's config (i.e. not the botpart ones).
     def save_config
       config = $bot[:config].clone
       config.delete :client
@@ -106,13 +112,17 @@ module Twittbot
       end
     end
 
+    # Checks some configuration values, e.g. if the bot is already authenticated with Twitter
     def check_config
       unless already_authed?
-        say "Please authenticate using `twittbot auth' first."
+        say "Please authenticate using `twittbot auth' first.", :red
         raise 'Not authenticated'
       end
     end
 
+    # Handles a object yielded from a Twitter::Streaming::Client.
+    # @param object [Object] The object yielded from a Twitter::Streaming::Client connection.
+    # @param type [Symbol] The type of the streamer.  Should be either :user or :filter.
     def handle_stream_object(object, type)
       opts = {
           stream_type: type
@@ -141,10 +151,14 @@ module Twittbot
       end
     end
 
+    # Runs callbacks.
+    # @param callback_type [:Symbol] The callback type.
+    # @param object [Object] The object
     def do_callbacks(callback_type, object, options = {})
       $bot[:callbacks][callback_type][:block].call object, options unless $bot[:callbacks][callback_type].nil?
     end
 
+    # @return [Boolean] whether the bot is already authenticated or not.
     def already_authed?
       !($bot[:config][:access_token].empty? or $bot[:config][:access_token_secret].empty?)
     end

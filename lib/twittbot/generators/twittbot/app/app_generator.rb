@@ -6,6 +6,7 @@ require 'twittbot/defaults'
 
 module Twittbot
   module Generators
+    # Class to generate a new Twittbot bot.
     class AppGenerator
       include Thor::Shell
 
@@ -17,6 +18,7 @@ module Twittbot
         @options['template_dir'] = File.expand_path @options['template_dir']
       end
 
+      # Creates the bot.
       def create
         path = File.expand_path "./#{@app_name}"
         if File.exist?(@app_name)

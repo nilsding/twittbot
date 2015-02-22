@@ -1,5 +1,9 @@
 module Twitter
   class Tweet
+    # Creates a reply to this tweet.
+    # @param tweet_text [:String] tweet text
+    # @param options [Hash] A customizable set of options.
+    # @option options [Boolean] :reply_all (false) Add all users mentioned in the tweet text to the reply.
     def reply(tweet_text, options = {})
       return if $bot.nil? or $bot[:client].nil?
       opts = {
@@ -15,6 +19,7 @@ module Twitter
       puts "caught Twitter error while retweeting: #{e.message}"
     end
 
+    # Retweets this tweet.
     def retweet
       return if $bot.nil? or $bot[:client].nil?
       $bot[:client].retweet self.id

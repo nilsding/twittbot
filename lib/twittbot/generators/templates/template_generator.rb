@@ -4,6 +4,7 @@ require 'yaml'
 
 module Twittbot
   module Generators
+    # Class to install a template to the bot.
     class TemplateGenerator
       include Thor::Shell
 
@@ -47,6 +48,8 @@ module Twittbot
         end
       end
 
+      # Adds an optional post-install message.
+      # @param msg [String] message to display
       def post_install_message(msg)
         @post_install_messages << msg
       end
