@@ -11,11 +11,15 @@ module Twitter
       result = "@#{mentions.join(" @")} #{tweet_text}"[(0...140)]
 
       $bot[:client].update result, in_reply_to_status_id: self.id
+    rescue Twitter::Error => e
+      puts "caught Twitter error while retweeting: #{e.message}"
     end
 
     def retweet
       return if $bot.nil? or $bot[:client].nil?
       $bot[:client].retweet self.id
+    rescue Twitter::Error => e
+      puts "caught Twitter error while retweeting: #{e.message}"
     end
 
     # Scans the tweet text for screen names.
