@@ -11,6 +11,7 @@ module Twittbot
     consumer_key: Twittbot::CONSUMER_KEY,
     consumer_secret: Twittbot::CONSUMER_SECRET,
     access_token: '',
-    access_token_secret: ''
+    access_token_secret: '',
+    track: []
   }
 end
