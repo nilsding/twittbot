@@ -72,12 +72,23 @@ module Twittbot
       end
 
       @userstream_thread ||= Thread.new do
+        puts "connected to user stream"
         @streamer.user do |obj|
           handle_stream_object obj, :user
         end
+        puts "lost user stream connection"
+      end
+
+      @tweetstream_thread ||= Thread.new do
+        puts "connected to tweet stream"
+        @streamer.filter track: $bot[:config][:track].join(",") do |obj|
+          handle_stream_object obj, :filter
+        end
+        puts "lost tweet stream connection"
       end
 
       @userstream_thread.join
+      @tweetstream_thread.join
     end
 
     def load_bot_code
