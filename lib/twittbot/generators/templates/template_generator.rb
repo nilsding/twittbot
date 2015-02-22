@@ -13,6 +13,7 @@ module Twittbot
             'template_options' => {}
         }.merge!(options)
         @options['template_dir'] = File.expand_path "../#{@template_name}", __FILE__
+        @post_install_messages = []
       end
 
       def create
@@ -40,6 +41,14 @@ module Twittbot
 
           save_config botpart_config, real_filename unless botpart_config.empty?
         end
+        unless @post_install_messages.empty?
+          say "Post install messages:", :yellow
+          puts @post_install_messages
+        end
+      end
+
+      def post_install_message(msg)
+        @post_install_messages << msg
       end
 
       private
