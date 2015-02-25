@@ -16,7 +16,7 @@ module Twittbot
 
     # Adds a new callback to +name+.
     # @param name [Symbol] The callback type.
-    #   Can be one of:
+    #   Can be (at least) one of:
     #
     #   * :tweet
     #   * :mention
