@@ -29,5 +29,11 @@ module Twittbot
           block: block
       }
     end
+
+    # @return [Twitter::REST::Client]
+    def client
+      $bot[:client]
+    end
+    alias bot client
   end
 end
