@@ -143,6 +143,7 @@ module Twittbot
               puts "no handler for #{object.class.to_s}/#{object.name}\n  -- object data:"
               require 'pp'
               pp object
+              do_callbacks object.name, object, opts
           end
         else
           puts "no handler for #{object.class.to_s}\n  -- object data:"
