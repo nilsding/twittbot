@@ -148,9 +148,10 @@ module Twittbot
           do_callbacks :tweet, object, opts.merge({ mention: is_mention, retweet: object.retweet? })
         when Twitter::Streaming::Event
           case object.name
-            when :follow
-              # object: Twitter::Streaming::Event(name: :follow, source: Twitter::User, target: Twitter::User)
-              do_callbacks :follow, object, opts
+            when :follow, :favorite
+              # :follow   -- object: Twitter::Streaming::Event(name: :follow,   source: Twitter::User, target: Twitter::User)
+              # :favorite -- object: Twitter::Streaming::Event(name: :favorite, source: Twitter::User, target: Twitter::User, target_object: Twitter::Tweet)
+              do_callbacks object.name, object, opts
             else
               puts "no handler for #{object.class.to_s}/#{object.name}\n  -- object data:"
               require 'pp'
