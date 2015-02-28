@@ -30,6 +30,37 @@ module Twittbot
       }
     end
 
+    # Runs +block+ every +interval+ +unit+(s).
+    # @param interval [Fixnum]
+    # @param unit [Symbol] the time unit.
+    #   Can be one of:
+    #
+    #   * :minute or :minutes
+    #   * :hour or :hours
+    # @param options [Hash] A customizable set of options.
+    # @option options [Boolean] :run_at_start (true) Run the code in +block+ when the bot finished starting.
+    def every(interval, unit = :minutes, options = {}, &block)
+      raise "Not a Fixnum: #{interval}" unless interval.is_a? Fixnum
+      raise "Interval less than 1" if interval < 1
+
+      opts = {
+          run_at_start: true
+      }.merge(options)
+
+      case unit
+        when :min, :mins, :minute, :minutes
+        when :hr, :hrs, :hour, :hours, :horse
+          interval *= 60
+        else
+          raise "Unknown unit: #{unit}"
+      end
+      $bot[:periodic] << {
+          interval: interval,
+          remaining: opts[:run_at_start] ? 0 : interval,
+          block: block
+      }
+    end
+
     # @return [Twitter::REST::Client]
     def client
       $bot[:client]

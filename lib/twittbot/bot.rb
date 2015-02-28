@@ -19,7 +19,8 @@ module Twittbot
 
       $bot = {
           callbacks: {},
-          config: YAML.load_file(File.expand_path("./#{Twittbot::CONFIG_FILE_NAME}", @options[:current_dir]))
+          config: YAML.load_file(File.expand_path("./#{Twittbot::CONFIG_FILE_NAME}", @options[:current_dir])),
+          periodic: []
       }.merge!(options)
 
       load_bot_code
@@ -90,8 +91,16 @@ module Twittbot
         puts "lost tweet stream connection"
       end
 
+      @periodic_thread ||= Thread.new do
+        loop do
+          do_periodic
+          sleep 60
+        end
+      end
+
       @userstream_thread.join
       @tweetstream_thread.join
+      @periodic_thread.join
     end
 
     # Loads the bot's actual code which is stored in the bot's +lib+
@@ -160,6 +169,18 @@ module Twittbot
     # @param object [Object] The object
     def do_callbacks(callback_type, object, options = {})
       $bot[:callbacks][callback_type][:block].call object, options unless $bot[:callbacks][callback_type].nil?
+    end
+
+    def do_periodic
+      $bot[:periodic].each_with_index do |h, i|
+        h[:remaining] = if h[:remaining] == 0
+                          h[:block].call
+                          h[:interval]
+                        else
+                          h[:remaining] - 1
+                        end
+        $bot[:periodic][i] = h
+      end
     end
 
     # @return [Boolean] whether the bot is already authenticated or not.
