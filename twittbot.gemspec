@@ -9,7 +9,7 @@ Gem::Specification.new do |spec|
   spec.authors       = ['nilsding']
   spec.email         = ['nilsding@nilsding.org']
   spec.summary       = %q{An advanced Twitter bot.}
-  spec.description   = %q{Twittbot is an advanced Twitter bot.  See the README and documentation for more info.}
+  spec.description   = %q{Twittbot is an advanced Twitter bot.  See the README for more info.}
   spec.homepage      = 'https://github.com/nilsding/twittbot'
   spec.license       = 'MIT'
 
