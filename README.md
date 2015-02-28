@@ -1,4 +1,4 @@
-# Twittbot
+# Twittbot [![Gem Version](https://badge.fury.io/rb/twittbot.svg)](http://badge.fury.io/rb/twittbot) [![Inline docs](http://inch-ci.org/github/nilsding/twittbot.svg?branch=master)](http://inch-ci.org/github/nilsding/twittbot)
 
 Twittbot is the next generation of my old Twitter bot, `twittbot-nd`.
 
