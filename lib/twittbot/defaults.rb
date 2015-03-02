@@ -16,6 +16,8 @@ module Twittbot
     consumer_secret: Twittbot::CONSUMER_SECRET,
     access_token: '',
     access_token_secret: '',
-    track: []
+    track: [],
+    admins: [],
+    dm_command_prefix: '!'
   }
 end

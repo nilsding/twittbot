@@ -19,11 +19,18 @@ module Twittbot
 
       $bot = {
           callbacks: {},
-          config: YAML.load_file(File.expand_path("./#{Twittbot::CONFIG_FILE_NAME}", @options[:current_dir])),
+          commands: {},
+          config: Twittbot::DEFAULT_BOT_CONFIG.merge(
+              YAML.load_file(File.expand_path("./#{Twittbot::CONFIG_FILE_NAME}", @options[:current_dir]))
+          ),
           periodic: []
       }.merge!(options)
 
       load_bot_code
+
+      at_exit do
+        save_config
+      end
     end
 
     # Authenticates an account with Twitter.
@@ -54,26 +61,12 @@ module Twittbot
       # get the bot's user name (screen_name) and print it to the console
       $bot[:config][:screen_name] = get_screen_name access_token
       puts "Hello, #{$bot[:config][:screen_name]}!"
-
-      save_config
     end
 
     # Starts the bot.
     def start
       check_config
-      $bot[:client] ||= Twitter::REST::Client.new do |cfg|
-        cfg.consumer_key        = $bot[:config][:consumer_key]
-        cfg.consumer_secret     = $bot[:config][:consumer_secret]
-        cfg.access_token        = $bot[:config][:access_token]
-        cfg.access_token_secret = $bot[:config][:access_token_secret]
-      end
-
-      @streamer ||= Twitter::Streaming::Client.new do |cfg|
-        cfg.consumer_key        = $bot[:config][:consumer_key]
-        cfg.consumer_secret     = $bot[:config][:consumer_secret]
-        cfg.access_token        = $bot[:config][:access_token]
-        cfg.access_token_secret = $bot[:config][:access_token_secret]
-      end
+      init_clients
 
       @userstream_thread ||= Thread.new do
         puts "connected to user stream"
@@ -101,6 +94,23 @@ module Twittbot
       @userstream_thread.join
       @tweetstream_thread.join
       @periodic_thread.join
+    end
+
+    # @param screen_name [String] the user's screen name
+    # @param action [Symbol] :add or :delete
+    def modify_admin(screen_name, action = :add)
+      init_clients
+      user = $bot[:client].user screen_name
+      case action
+        when :add
+          $bot[:config][:admins] << user.id unless $bot[:config][:admins].include? user.id
+        when :del, :delete
+          $bot[:config][:admins].delete user.id if $bot[:config][:admins].include? user.id
+        else
+          say "Unknown action " + action.to_s, :red
+      end
+    rescue Twitter::Error::NotFound
+      say "User not found.", :red
     end
 
     # Loads the bot's actual code which is stored in the bot's +lib+
@@ -158,6 +168,8 @@ module Twittbot
               pp object
               do_callbacks object.name, object, opts
           end
+        when Twitter::DirectMessage
+          do_direct_message object, opts
         else
           puts "no handler for #{object.class.to_s}\n  -- object data:"
           require 'pp'
@@ -184,12 +196,48 @@ module Twittbot
       end
     end
 
+    # Processes a direct message.
+    # @param dm [Twitter::DirectMessage] received direct message
+    def do_direct_message(dm, opts = {})
+      return if dm.sender.screen_name == $bot[:config][:screen_name]
+      return do_callbacks(:direct_message, dm, opts) unless dm.text.start_with? $bot[:config][:dm_command_prefix]
+      dm_text = dm.text.sub($bot[:config][:dm_command_prefix], '').strip
+      return if dm_text.empty?
+
+      return unless /(?<command>[A-Za-z0-9]+)(?:\s*)(?<args>.*)/m =~ dm_text
+      command = Regexp.last_match(:command).to_sym
+      args = Regexp.last_match :args
+
+      cmd = $bot[:commands][command]
+      return say_status :dm, "#{dm.sender.screen_name} tried to issue non-existent command :#{command}, ignoring", :cyan if cmd.nil?
+      return say_status :dm, "#{dm.sender.screen_name} tried to issue admin command :#{command}, ignoring", :cyan if cmd[:admin] and !dm.sender.admin?
+
+      say_status :dm, "#{dm.sender.screen_name} issued command :#{command}", :cyan
+      cmd[:block].call(args, dm.sender)
+    end
+
     # @return [Boolean] whether the bot is already authenticated or not.
     def already_authed?
       !($bot[:config][:access_token].empty? or $bot[:config][:access_token_secret].empty?)
     end
 
     private
+
+    def init_clients
+      $bot[:client] ||= Twitter::REST::Client.new do |cfg|
+        cfg.consumer_key        = $bot[:config][:consumer_key]
+        cfg.consumer_secret     = $bot[:config][:consumer_secret]
+        cfg.access_token        = $bot[:config][:access_token]
+        cfg.access_token_secret = $bot[:config][:access_token_secret]
+      end
+
+      @streamer ||= Twitter::Streaming::Client.new do |cfg|
+        cfg.consumer_key        = $bot[:config][:consumer_key]
+        cfg.consumer_secret     = $bot[:config][:consumer_secret]
+        cfg.access_token        = $bot[:config][:access_token]
+        cfg.access_token_secret = $bot[:config][:access_token_secret]
+      end
+    end
 
     def get_screen_name(access_token)
       oauth_response = access_token.get('/1.1/account/verify_credentials.json?skip_status=true')
