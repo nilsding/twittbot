@@ -23,6 +23,7 @@ module Twittbot
     #   * :retweet
     #   * :favorite
     #   * :friend_list
+    #   * :direct_message (i.e. not command DMs, see {cmd} for that)
     def on(name, *args, &block)
       $bot[:callbacks][name] ||= {
           args: args,
@@ -66,5 +67,24 @@ module Twittbot
       $bot[:client]
     end
     alias bot client
+
+    # Defines a new direct message command.
+    # @param name [Symbol] The name of the command.  Can only contain alphanumerical characters.
+    #   The recommended maximum length is 4 characters.
+    # @param options [Hash] A customizable set of options.
+    # @option options [Boolean] :admin (true) Require admin status for this command.
+    def cmd(name, options = {}, &block)
+      raise "Command already exists: #{name}" if $bot[:commands].include? name
+      raise "Command name does not contain only alphanumerical characters" unless name.to_s.match /\A[A-Za-z0-9]+\z/
+
+      opts = {
+          admin: true
+      }.merge(options)
+
+      $bot[:commands][name] ||= {
+          admin: opts[:admin],
+          block: block
+      }
+    end
   end
 end
