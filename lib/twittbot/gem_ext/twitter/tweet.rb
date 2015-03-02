@@ -16,7 +16,7 @@ module Twitter
 
       $bot[:client].update result, in_reply_to_status_id: self.id
     rescue Twitter::Error => e
-      puts "caught Twitter error while retweeting: #{e.message}"
+      puts "caught Twitter error while replying: #{e.message}"
     end
 
     # Retweets this tweet.
