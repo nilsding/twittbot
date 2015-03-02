@@ -39,5 +39,19 @@ module Twittbot
       lister = Twittbot::TemplateLister.new options
       lister.list
     end
+
+    desc 'add-admin USER_NAME', 'Adds an user to the botadmin list'
+    def add_admin(user_name)
+      require 'twittbot/bot'
+      bot = Twittbot::Bot.new
+      bot.modify_admin(user_name, :add)
+    end
+
+    desc 'del-admin USER_NAME', 'Removes an user from the botadmin list'
+    def del_admin(user_name)
+      require 'twittbot/bot'
+      bot = Twittbot::Bot.new
+      bot.modify_admin(user_name, :delete)
+    end
   end
 end

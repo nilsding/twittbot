@@ -19,6 +19,10 @@ Authorize with Twitter:
 
     $ twittbot auth
 
+Add yourself as a botadmin:
+
+    $ twittbot add-admin nilsding
+
 Add a template, such as for a simple reply bot:
 
     $ twittbot generate random-reply
