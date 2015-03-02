@@ -18,6 +18,7 @@ module Twittbot
       }
 
       $bot = {
+          botparts: [],
           callbacks: {},
           commands: {},
           config: Twittbot::DEFAULT_BOT_CONFIG.merge(
@@ -30,6 +31,7 @@ module Twittbot
 
       at_exit do
         save_config
+        $bot[:botparts].each { |b| b.save_config }
       end
     end
 

@@ -5,13 +5,14 @@ module Twittbot
   class BotPart
     # @param name [Symbol] The name of the botpart.  Should be the same as the file name without the extension.
     def initialize(name, &block)
-      botpart_config_path = File.expand_path("./etc/#{name}.yml")
-      @config = $bot[:config].merge(if File.exist? botpart_config_path
-                                      YAML.load_file botpart_config_path
+      @botpart_config_path = File.expand_path("./etc/#{name}.yml")
+      @config = $bot[:config].merge(if File.exist? @botpart_config_path
+                                      YAML.load_file @botpart_config_path
                                     else
                                       {}
                                     end)
       instance_eval &block
+      $bot[:botparts] << self
     end
 
     # Adds a new callback to +name+.
@@ -85,6 +86,18 @@ module Twittbot
           admin: opts[:admin],
           block: block
       }
+    end
+
+    # Saves the botpart's configuration.  This is automatically called when
+    # Twittbot exits.
+    def save_config
+      botpart_config = Hash[@config.to_a - $bot[:config].to_a]
+
+      unless botpart_config.empty?
+        File.open @botpart_config_path, 'w' do |f|
+          f.write botpart_config.to_yaml
+        end
+      end
     end
   end
 end
