@@ -4,6 +4,14 @@
   botpart_config = {
     magic_word: "Supercalifragilisticexpialidocious" # (I'll buy you a beer if you can spell this correctly while drunk)
   }
+
+  # Display a message after installation template installation
+  post_install_message <<-MSG
+In order to make some commands work, you need to be a BotAdmin.  You can add
+yourself to the BotAdmin list by starting
+
+    twittbot add-admin your_user_name
+MSG
 %>
 Twittbot::BotPart.new :<%= @template_name %> do
   # This command gives a BotAdmin the ability to tweet via the bot.
