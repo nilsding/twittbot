@@ -71,24 +71,33 @@ module Twittbot
       init_clients
 
       @userstream_thread ||= Thread.new do
-        puts "connected to user stream"
-        @streamer.user do |obj|
-          handle_stream_object obj, :user
+        begin
+          puts "connected to user stream"
+          @streamer.user do |obj|
+            handle_stream_object obj, :user
+          end
+        rescue
+          puts "lost user stream connection"
         end
-        puts "lost user stream connection"
       end
 
       @tweetstream_thread ||= Thread.new do
-        puts "connected to tweet stream"
-        @streamer.filter track: $bot[:config][:track].join(",") do |obj|
-          handle_stream_object obj, :filter
+        begin
+          puts "connected to tweet stream"
+          @streamer.filter track: $bot[:config][:track].join(",") do |obj|
+            handle_stream_object obj, :filter
+          end
+        rescue
+          puts "lost tweet stream connection"
         end
-        puts "lost tweet stream connection"
       end
 
       @periodic_thread ||= Thread.new do
         loop do
-          do_periodic
+          begin
+            do_periodic
+          rescue => _
+          end
           sleep 60
         end
       end
