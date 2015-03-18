@@ -20,4 +20,7 @@ module Twittbot
     admins: [],
     dm_command_prefix: '!'
   }
+
+  # How many seconds should be waited until the bot reconnects
+  RECONNECT_WAIT_TIME = 5
 end
