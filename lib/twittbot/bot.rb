@@ -200,7 +200,10 @@ module Twittbot
     # @param callback_type [:Symbol] The callback type.
     # @param object [Object] The object
     def do_callbacks(callback_type, object, options = {})
-      $bot[:callbacks][callback_type][:block].call object, options unless $bot[:callbacks][callback_type].nil?
+      return if $bot[:callbacks][callback_type].nil?
+      $bot[:callbacks][callback_type].each do |c|
+        c[:block].call object, options
+      end
     end
 
     def do_periodic

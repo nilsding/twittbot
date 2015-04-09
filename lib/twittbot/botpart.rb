@@ -26,7 +26,8 @@ module Twittbot
     #   * :friend_list
     #   * :direct_message (i.e. not command DMs, see {cmd} for that)
     def on(name, *args, &block)
-      $bot[:callbacks][name] ||= {
+      $bot[:callbacks][name] ||= []
+      $bot[:callbacks][name] << {
           args: args,
           block: block
       }
