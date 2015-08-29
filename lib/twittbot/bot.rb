@@ -176,7 +176,7 @@ module Twittbot
           is_mention = (object.user.screen_name != $bot[:config][:screen_name] and object.text.include?("@" + $bot[:config][:screen_name]) and not object.retweet?)
           do_callbacks :retweet, object, opts if object.retweet? and object.retweeted_tweet.user.screen_name == $bot[:config][:screen_name]
           do_callbacks :mention, object, opts if is_mention
-          do_callbacks :tweet, object, opts.merge({ mention: is_mention, retweet: object.retweet? })
+          do_callbacks :tweet, object, opts.merge({ mention: is_mention, retweet: object.retweet?, favorite: x.favorited? })
         when Twitter::Streaming::Event
           case object.name
             when :follow, :favorite

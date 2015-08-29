@@ -26,6 +26,19 @@ module Twitter
     rescue Twitter::Error => e
       puts "caught Twitter error while retweeting: #{e.message}"
     end
+    alias rt retweet
+
+    # Favourites a tweet
+    def favourite
+      return if $bot.nil? or $bot[:client].nil?
+      $bot[:client].favorite self.id
+    rescue Twitter::Error => e
+      puts "caught Twitter error while favouriting: #{e.message}"
+    end
+    alias fav favourite
+    alias fave favourite
+    # for the 'muricans
+    alias favorite favourite
 
     # Scans the tweet text for screen names.
     # @param reply_all [Boolean] Include all users in the reply.
