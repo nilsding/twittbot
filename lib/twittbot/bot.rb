@@ -110,6 +110,8 @@ module Twittbot
         end
       end
 
+      do_callbacks :load, nil
+
       @userstream_thread.join
       @tweetstream_thread.join
       @periodic_thread.join

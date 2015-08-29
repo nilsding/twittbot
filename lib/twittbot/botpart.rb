@@ -25,6 +25,7 @@ module Twittbot
     #   * :favorite
     #   * :friend_list
     #   * :direct_message (i.e. not command DMs, see {cmd} for that)
+    #   * :load (when the bot finished initializing)
     def on(name, *args, &block)
       $bot[:callbacks][name] ||= []
       $bot[:callbacks][name] << {
