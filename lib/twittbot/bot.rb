@@ -103,7 +103,7 @@ module Twittbot
       @periodic_thread ||= Thread.new do
         loop do
           begin
-            do_periodic
+            Thread.new { do_periodic }
           rescue => _
           end
           sleep 60
@@ -210,7 +210,7 @@ module Twittbot
 
     def do_periodic
       $bot[:periodic].each_with_index do |h, i|
-        h[:remaining] = if h[:remaining] == 0
+        h[:remaining] = if h[:remaining] - 1 <= 0
                           h[:block].call
                           h[:interval]
                         else
