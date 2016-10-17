@@ -2,6 +2,9 @@
 
 ## 0.4.0
 
+* Add `tweet.favourite` method
+* Add `:favorite` to `on :tweet` options
+* Fix periodic blocks being called 1 minute later than expected
 * Add `twittbot cron` for interacting with the bot outside from Twittbot processes, e.g. via cron
 * Modify `retweet-bot` template to ignore retweets from ourselves
 * Add new `big-ben-clock` template which demonstrates the usage of `twittbot cron`.
