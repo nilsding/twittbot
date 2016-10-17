@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.0
+
+* Add `twittbot cron` for interacting with the bot outside from Twittbot processes, e.g. via cron
+* Modify `retweet-bot` template to ignore retweets from ourselves
+* Add new `big-ben-clock` template which demonstrates the usage of `twittbot cron`.
+
 ## 0.3.0
 
 * Add `on :load` event.
