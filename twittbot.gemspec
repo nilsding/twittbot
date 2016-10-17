@@ -22,7 +22,7 @@ Gem::Specification.new do |spec|
   spec.add_dependency 'erubis', '~> 2.7', '>= 2.7.0'
   spec.add_dependency 'oauth', '~> 0.5'
   spec.add_dependency 'twitter', '~> 5.16'
-  spec.add_development_dependency 'yard', '~> 0.8'
+  spec.add_development_dependency 'yard', '~> 0.9'
   spec.add_development_dependency 'bundler', '>= 1.7'
-  spec.add_development_dependency 'rake', '~> 10.5'
+  spec.add_development_dependency 'rake', '~> 11.3'
 end
