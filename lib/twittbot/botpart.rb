@@ -90,6 +90,26 @@ module Twittbot
       }
     end
 
+    # Defines a new task to be run outside of a running Twittbot process.
+    # @param name [Symbol] The name of the task.
+    # @param options [Hash] A customizable set of options.
+    # @option options [String] :desc ("") Description of this task
+    def task(name, options = {}, &block)
+      name = name.to_s.downcase.to_sym
+      task_re = /\A[a-z0-9.:-_]+\z/
+      raise "Task already exists: #{name}" if $bot[:tasks].include?(name)
+      raise "Task name does not match regexp #{task_re.to_s}" unless name.to_s.match(task_re)
+
+      opts = {
+        desc: ''
+      }.merge(options)
+
+      $bot[:tasks][name] ||= {
+        block: block,
+        desc: opts[:desc]
+      }
+    end
+
     # Saves the botpart's configuration.  This is automatically called when
     # Twittbot exits.
     def save_config

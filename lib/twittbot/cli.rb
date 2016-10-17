@@ -26,6 +26,13 @@ module Twittbot
       bot.start
     end
 
+    desc 'cron TASK_NAME', 'Runs the task TASK_NAME, useful for calling from cron'
+    def cron(task_name)
+      require 'twittbot/bot'
+      bot = Twittbot::Bot.new(save_config: false)
+      bot.cron(task_name.downcase.to_sym)
+    end
+
     desc 'generate TEMPLATE_NAME', 'Installs a template'
     def generate(template_name)
       require 'twittbot/generators/templates/template_generator'

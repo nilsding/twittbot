@@ -24,7 +24,9 @@ module Twittbot
           config: Twittbot::DEFAULT_BOT_CONFIG.merge(
               YAML.load_file(File.expand_path("./#{Twittbot::CONFIG_FILE_NAME}", @options[:current_dir]))
           ),
-          periodic: []
+          periodic: [],
+          save_config: true,
+          tasks: {}
       }.merge!(options)
 
       load_bot_code
@@ -32,7 +34,7 @@ module Twittbot
       at_exit do
         save_config
         $bot[:botparts].each { |b| b.save_config }
-      end
+      end if $bot[:save_config]
     end
 
     # Authenticates an account with Twitter.
@@ -117,6 +119,20 @@ module Twittbot
       @periodic_thread.join
     end
 
+    # Runs the task `task_name`.
+    # @param task_name [Symbol] The name of the task to be run.
+    def cron(task_name)
+      task = $bot[:tasks][task_name]
+      unless task
+        say "Task \"#{task_name}\" does not exist.  Use \"twittbot cron list\" for a list of available tasks."
+        return
+      end
+
+      #check_config
+      init_clients
+      task[:block].call
+    end
+
     # @param screen_name [String] the user's screen name
     # @param action [Symbol] :add or :delete
     def modify_admin(screen_name, action = :add)
@@ -137,6 +153,7 @@ module Twittbot
     # Loads the bot's actual code which is stored in the bot's +lib+
     # subdirectory.
     def load_bot_code
+      load_special_tasks
       files = Dir["#{File.expand_path('./lib', @options[:current_dir])}/**/*"]
       files.each do |file|
         require_relative file.sub(/\.rb$/, '') if file.end_with? '.rb'
@@ -266,6 +283,29 @@ module Twittbot
     def get_screen_name(access_token)
       oauth_response = access_token.get('/1.1/account/verify_credentials.json?skip_status=true')
       oauth_response.body.match(/"screen_name"\s*:\s*"(.*?)"/).captures.first
+    end
+
+    # Load special tasks (e.g. list)
+    def load_special_tasks
+      $bot[:tasks][:list] = {
+        block: -> do
+          list_tasks
+        end,
+        desc: 'List all available tasks'
+      }
+    end
+
+    # Lists all tasks
+    def list_tasks
+      tasks = $bot[:tasks].map do |name, value|
+        [name, value[:desc]]
+      end.to_h
+      longest_name = tasks.keys.map(&:to_s).max { |a, b| a.length <=> b.length }.length
+      tasks = tasks.map do |name, desc|
+        "twittbot cron %-*s # %s" % [longest_name + 2, name, desc]
+      end.sort
+
+      puts tasks
     end
   end
 end
