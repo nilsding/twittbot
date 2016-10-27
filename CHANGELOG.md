@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.5.0
+
+* Add `:deleted` to `on :tweet` options
+
 ## 0.4.0
 
 * Add `tweet.favourite` method
