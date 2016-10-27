@@ -208,6 +208,8 @@ module Twittbot
           end
         when Twitter::DirectMessage
           do_direct_message object, opts
+        when Twitter::Streaming::DeletedTweet
+          do_callbacks :deleted, object
         else
           puts "no handler for #{object.class.to_s}\n  -- object data:"
           require 'pp'

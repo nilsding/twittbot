@@ -17,7 +17,7 @@ module Twittbot
 
     # Adds a new callback to +name+.
     # @param name [Symbol] The callback type.
-    #   Can be (at least) one of:
+    #   Can be one of:
     #
     #   * :tweet
     #   * :mention
@@ -26,6 +26,7 @@ module Twittbot
     #   * :friend_list
     #   * :direct_message (i.e. not command DMs, see {cmd} for that)
     #   * :load (when the bot finished initializing)
+    #   * :deleted (when a tweet got deleted, only stores id in object)
     def on(name, *args, &block)
       $bot[:callbacks][name] ||= []
       $bot[:callbacks][name] << {
@@ -44,7 +45,7 @@ module Twittbot
     # @param options [Hash] A customizable set of options.
     # @option options [Boolean] :run_at_start (true) Run the code in +block+ when the bot finished starting.
     def every(interval, unit = :minutes, options = {}, &block)
-      raise "Not a Fixnum: #{interval}" unless interval.is_a? Fixnum
+      raise "Not a Integer: #{interval}" unless interval.is_a? Integer
       raise "Interval less than 1" if interval < 1
 
       opts = {
