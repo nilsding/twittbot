@@ -54,5 +54,11 @@ module Twitter
       end
       userlist
     end
+
+    # Returns the full expanded tweet (over 140 characters)
+    # @return [String] The expanded tweet
+    def expanded_text
+      self.attrs.dig(:extended_tweet, :full_text) || full_text || text
+    end
   end
 end

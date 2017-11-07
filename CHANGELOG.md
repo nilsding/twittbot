@@ -2,6 +2,7 @@
 
 ## 0.5.0
 
+* Add `expanded_text` method to Tweet objects which returns the full >140 character tweet text.
 * Add `:deleted` to `on :tweet` options
 
 ## 0.4.0
