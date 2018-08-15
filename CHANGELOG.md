@@ -1,5 +1,10 @@
 # Changelog
 
+## 0.6.0
+
+* Add `--no-stream` flag to the `start` command to disable connections to the
+  Streaming API
+
 ## 0.5.0
 
 * Add `expanded_text` method to Tweet objects which returns the full >140 character tweet text.

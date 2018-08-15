@@ -20,9 +20,10 @@ module Twittbot
     end
 
     desc 'start', 'Starts the bot'
+    method_option :stream, type: :boolean, desc: "Enable or disable the streaming API connection", default: true
     def start
       require 'twittbot/bot'
-      bot = Twittbot::Bot.new
+      bot = Twittbot::Bot.new(options)
       bot.start
     end
 

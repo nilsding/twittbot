@@ -1,6 +1,6 @@
 module Twittbot
   # The version of Twittbot.
-  VERSION = "0.5.0"
+  VERSION = "0.6.0"
 
   CONSUMER_KEY = 'FYRuQcDbPAXAyVjuPZMuw' # :nodoc:
   CONSUMER_SECRET = 'KiLCYTftPdxNebl5DNcj7Ey2Y8YVZu7hfqiFRYkcg' # :nodoc:

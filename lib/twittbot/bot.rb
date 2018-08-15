@@ -26,8 +26,9 @@ module Twittbot
           ),
           periodic: [],
           save_config: true,
-          tasks: {}
-      }.merge!(options)
+          tasks: {},
+          stream: options.fetch("stream", true)
+      }
 
       load_bot_code
 
@@ -72,33 +73,37 @@ module Twittbot
       check_config
       init_clients
 
-      @userstream_thread ||= Thread.new do
-        loop do
-          begin
-            puts "connected to user stream"
-            @streamer.user do |obj|
-              handle_stream_object obj, :user
-            end
-          rescue => e
-            puts "lost user stream connection: " + e.message
-          end
-          puts "reconnecting in #{Twittbot::RECONNECT_WAIT_TIME} seconds..."
-          sleep Twittbot::RECONNECT_WAIT_TIME
-        end
-      end
+      if $bot[:stream]
+        puts "connecting to streaming APIs"
 
-      @tweetstream_thread ||= Thread.new do
-        loop do
-          begin
-            puts "connected to tweet stream"
-            @streamer.filter track: $bot[:config][:track].join(",") do |obj|
-              handle_stream_object obj, :filter
+        @userstream_thread ||= Thread.new do
+          loop do
+            begin
+              puts "connected to user stream"
+              @streamer.user do |obj|
+                handle_stream_object obj, :user
+              end
+            rescue => e
+              puts "lost user stream connection: " + e.message
             end
-          rescue
-            puts "lost tweet stream connection: " + e.message
+            puts "reconnecting in #{Twittbot::RECONNECT_WAIT_TIME} seconds..."
+            sleep Twittbot::RECONNECT_WAIT_TIME
           end
-          puts "reconnecting in #{Twittbot::RECONNECT_WAIT_TIME} seconds..."
-          sleep Twittbot::RECONNECT_WAIT_TIME
+        end
+
+        @tweetstream_thread ||= Thread.new do
+          loop do
+            begin
+              puts "connected to tweet stream"
+              @streamer.filter track: $bot[:config][:track].join(",") do |obj|
+                handle_stream_object obj, :filter
+              end
+            rescue
+              puts "lost tweet stream connection: " + e.message
+            end
+            puts "reconnecting in #{Twittbot::RECONNECT_WAIT_TIME} seconds..."
+            sleep Twittbot::RECONNECT_WAIT_TIME
+          end
         end
       end
 
@@ -114,8 +119,10 @@ module Twittbot
 
       do_callbacks :load, nil
 
-      @userstream_thread.join
-      @tweetstream_thread.join
+      if $bot[:stream]
+        @userstream_thread.join
+        @tweetstream_thread.join
+      end
       @periodic_thread.join
     end
 
